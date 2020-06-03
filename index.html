@@ -22,6 +22,18 @@
         <span>adjusted distances y</span>
         <div id="adjusted_distances_y">
         </div>
+        <span>total unadjusted distances x</span>
+        <div id="total_unadjusted_distances_x">
+        </div>
+        <span>total unadjusted distances y</span>
+        <div id="total_unadjusted_distances_y">
+        </div>
+        <span>total adjusted distances x</span>
+        <div id="total_adjusted_distances_x">
+        </div>
+        <span>total adjusted distances y</span>
+        <div id="total_adjusted_distances_y">
+        </div>
         <script>
             let lock_element = document.getElementById("lock_element");
             let lock_button = document.getElementById("lock");
@@ -33,7 +45,10 @@
             let adjusted_distances_y_label = document.getElementById("adjusted_distances_y");
             let unadjusted_distances_x_label = document.getElementById("unadjusted_distances_x");
             let unadjusted_distances_y_label = document.getElementById("unadjusted_distances_y");
-
+            let total_unadjusted_distances_x_label = document.getElementById("total_unadjusted_distances_x");
+            let total_unadjusted_distances_y_label = document.getElementById("total_unadjusted_distances_y");
+            let total_adjusted_distances_x_label = document.getElementById("total_adjusted_distances_x");
+            let total_adjusted_distances_y_label = document.getElementById("total_adjusted_distances_y");
 
             let maxes_unadjusted = [];
             let maxes_normal = [];
@@ -55,6 +70,7 @@
                 y_label.textContent = "movementY: " + event.movementY;
                 distance_x += Math.abs(event.movementX);
                 distance_y += Math.abs(event.movementY);
+                count++;
                 if(event.movementX > current_max_x) {
                     current_max_x = event.movementX;
                 }
@@ -63,17 +79,30 @@
                 }
             })
 
+            let sum = function(array) {
+                let total = 0;
+                array.forEach(value => {
+                    total += value
+                });
+                return total
+            }
+
             let changeLock = function() {
+                console.log('number of readings: ', count);
                 if(unadjusted) {
                     unadjusted_distances_x.push(distance_x);
                     unadjusted_distances_y.push(distance_y);
                     unadjusted_distances_x_label.textContent = unadjusted_distances_x.join();
                     unadjusted_distances_y_label.textContent = unadjusted_distances_y.join();
+                    total_unadjusted_distances_x_label.textContent = sum(unadjusted_distances_x);
+                    total_unadjusted_distances_y_label.textContent = sum(unadjusted_distances_y);
                 } else {
                     adjusted_distances_x.push(distance_x);
                     adjusted_distances_y.push(distance_y);
                     adjusted_distances_x_label.textContent = adjusted_distances_x.join();
                     adjusted_distances_y_label.textContent = adjusted_distances_y.join();
+                    total_adjusted_distances_x_label.textContent = sum(adjusted_distances_x);
+                    total_adjusted_distances_y_label.textContent = sum(adjusted_distances_y);
                 }
                 distance_x = 0;
                 distance_y = 0;
@@ -85,9 +114,11 @@
                     console.log('promise rejected', e);
                 });
                 if(!stoping_timeout) {
-                    setTimeout(changeLock, 1000);
+                    setTimeout(changeLock, 200);
                 }
+                count = 0;
             }
+
 
             lock_button.addEventListener("click", (event) => {
                 lock_element.requestPointerLock({unadjustedMovement:unadjusted})
@@ -96,7 +127,7 @@
                 }).catch(e => {
                     console.log('promise rejected', e);
                 });
-                setTimeout(changeLock, 500);
+                setTimeout(changeLock, 100);
             });
 
             document.addEventListener("pointerlockerror", (event) => {
