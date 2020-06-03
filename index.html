@@ -132,13 +132,15 @@
                 var unadjusted_distances = {
                     x: read_numbers,
                     y: unadjusted_distances_x,
-                    type: 'scatter'
+                    type: 'scatter',
+                    name:"unadjusted movement"
                 };
 
                 var adjusted_distances = {
                     x: read_numbers,
                     y: adjusted_distances_x,
-                    type: 'scatter'
+                    type: 'scatter',
+                    name:"accelerated movement"
                 };
 
                 var data = [unadjusted_distances, adjusted_distances];
