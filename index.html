@@ -65,13 +65,12 @@
             let unadjusted_distances_y = [];
             let adjusted_distances_x = [];
             let adjusted_distances_y = [];
-            let read_numbers_unadjusted = [];
-            let read_numbers_adjusted = [];
+            let read_numbers= [];
             let distance_x = 0;
             let distance_y = 0;
             let unadjusted = false;
             let count = 0;
-            let useful_count = 0;
+            let total_count = 0;
             let current_max_x = 0;
             let current_max_y = 0;
             let stoping_timeout = false;
@@ -80,19 +79,9 @@
                 // console.log('mouse moved', event);
                 x_label.textContent = "movementX: " + event.movementX;
                 y_label.textContent = "movementY: " + event.movementY;
-                useful_count++;
+                total_count++;
+                read_numbers.push(total_count);
                 count++;
-                if(Math.abs(event.movementX) > 200) {
-                    if(unadjusted){
-                        unadjusted_x_movements.push(Math.abs(event.movementX));
-                        unadjusted_y_movements.push(Math.abs(event.movementY));
-                        read_numbers_unadjusted.push(useful_count);
-                    } else {
-                        adjusted_x_movements.push(Math.abs(event.movementX));
-                        adjusted_y_movements.push(Math.abs(event.movementY));
-                        read_numbers_adjusted.push(useful_count);
-                    }
-                }
                 distance_x += Math.abs(event.movementX);
                 distance_y += Math.abs(event.movementY);
                 if(event.movementX > current_max_x) {
@@ -112,7 +101,6 @@
             }
 
             let changeLock = function() {
-                console.log('number of readings: ', count);
                 if(unadjusted) {
                     unadjusted_distances_x.push(distance_x);
                     unadjusted_distances_y.push(distance_y);
@@ -141,19 +129,19 @@
                     setTimeout(changeLock, 200);
                 }
 
-                var unadjusted_peaks = {
-                    x: read_numbers_unadjusted,
-                    y: unadjusted_x_movements,
+                var unadjusted_distances = {
+                    x: read_numbers,
+                    y: unadjusted_distances_x,
                     type: 'scatter'
                 };
 
-                var adjusted_peaks = {
-                    x: read_numbers_adjusted,
-                    y: adjusted_x_movements,
+                var adjusted_distances = {
+                    x: read_numbers,
+                    y: unadjusted_distances_x,
                     type: 'scatter'
                 };
 
-                var data = [unadjusted_peaks, adjusted_peaks];
+                var data = [unadjusted_distances, adjusted_distances];
 
                 Plotly.newPlot('plot', data);
 
@@ -174,6 +162,7 @@
 
             document.addEventListener("pointerlockerror", (event) => {
                 console.log('got pointerlockerror', event);
+                stopping_timeout = true;
             });
             document.addEventListener("pointerlockerror", (event) => {
                 console.log('pointer lock changed')
