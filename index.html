@@ -99,7 +99,8 @@
             }
 
             let changeLock = function() {
-                if(adjusted_distances_x + adjusted_distances_y + unadjusted_distances_x + unadjusted_distances_y == 0 && !stoping_timeout){
+                if((distance_x + distance_y) == 0 && !stoping_timeout){
+                    console.log("not recording");
                     setTimeout(changeLock, 200);
                     return;
                 }
