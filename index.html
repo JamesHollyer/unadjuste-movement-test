@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div id=lock_element style="background-color: aqua;">
+            <button id="lock">lock</button>
+        </div>
+        <!-- <span>movementx: </span> -->
+        <span id="movementx"></span>
+        <!-- <span>movementy: </span> -->
+        <span id="movementy"></span>
+        <div id="maxes">
+        </div>
+        <span>unadjusted distances x</span>
+        <div id="unadjusted_distances_x">
+        </div>
+        <span>unadjusted distances y</span>
+        <div id="unadjusted_distances_y">
+        </div>
+        <span>adjusted distances x</span>
+        <div id="adjusted_distances_x">
+        </div>
+        <span>adjusted distances y</span>
+        <div id="adjusted_distances_y">
+        </div>
+        <script>
+            let lock_element = document.getElementById("lock_element");
+            let lock_button = document.getElementById("lock");
+            let x_label = document.getElementById("movementx");
+            let y_label = document.getElementById("movementy");
+            let new_max = document.getElementById("new_max");
+            let maxes_label = document.getElementById("maxes");
+            let adjusted_distances_x_label = document.getElementById("adjusted_distances_x");
+            let adjusted_distances_y_label = document.getElementById("adjusted_distances_y");
+            let unadjusted_distances_x_label = document.getElementById("unadjusted_distances_x");
+            let unadjusted_distances_y_label = document.getElementById("unadjusted_distances_y");
+
+
+            let maxes_unadjusted = [];
+            let maxes_normal = [];
+            let unadjusted_distances_x = [];
+            let unadjusted_distances_y = [];
+            let adjusted_distances_x = [];
+            let adjusted_distances_y = [];
+            let distance_x = 0;
+            let distance_y = 0;
+            let unadjusted = false;
+            let count = 0;
+            let current_max_x = 0;
+            let current_max_y = 0;
+            let stoping_timeout = false;
+
+            lock_element.addEventListener("mousemove", (event) => {
+                // console.log('mouse moved', event);
+                x_label.textContent = "movementX: " + event.movementX;
+                y_label.textContent = "movementY: " + event.movementY;
+                distance_x += Math.abs(event.movementX);
+                distance_y += Math.abs(event.movementY);
+                if(event.movementX > current_max_x) {
+                    current_max_x = event.movementX;
+                }
+                if(event.movementY > current_max_y) {
+                    current_max_y = event.movementY;
+                }
+            })
+
+            let changeLock = function() {
+                if(unadjusted) {
+                    unadjusted_distances_x.push(distance_x);
+                    unadjusted_distances_y.push(distance_y);
+                    unadjusted_distances_x_label.textContent = unadjusted_distances_x.join();
+                    unadjusted_distances_y_label.textContent = unadjusted_distances_y.join();
+                } else {
+                    adjusted_distances_x.push(distance_x);
+                    adjusted_distances_y.push(distance_y);
+                    adjusted_distances_x_label.textContent = adjusted_distances_x.join();
+                    adjusted_distances_y_label.textContent = adjusted_distances_y.join();
+                }
+                distance_x = 0;
+                distance_y = 0;
+                unadjusted = !unadjusted;
+                lock_element.requestPointerLock({unadjustedMovement:unadjusted})
+                .then(() => {
+                    console.log('switch unadjusted to ', unadjusted);
+                }).catch(e => {
+                    console.log('promise rejected', e);
+                });
+                if(!stoping_timeout) {
+                    setTimeout(changeLock, 1000);
+                }
+            }
+
+            lock_button.addEventListener("click", (event) => {
+                lock_element.requestPointerLock({unadjustedMovement:unadjusted})
+                .then(() => {
+                    console.log('switch unadjusted to ', unadjusted);
+                }).catch(e => {
+                    console.log('promise rejected', e);
+                });
+                setTimeout(changeLock, 500);
+            });
+
+            document.addEventListener("pointerlockerror", (event) => {
+                console.log('got pointerlockerror', event);
+            });
+            document.addEventListener("pointerlockerror", (event) => {
+                console.log('pointer lock changed')
+                stopping_timeout = true;
+            })
+        </script>
+    </body>
+</html>
