@@ -1,5 +1,8 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <script src="plotly-latest.min.js"></script>
+    </head>
     <body>
         <div id=lock_element style="background-color: aqua;">
             <button id="lock">lock</button>
@@ -34,6 +37,7 @@
         <span>total adjusted distances y</span>
         <div id="total_adjusted_distances_y">
         </div>
+        <div id="plot"></div>
         <script>
             let lock_element = document.getElementById("lock_element");
             let lock_button = document.getElementById("lock");
@@ -49,17 +53,25 @@
             let total_unadjusted_distances_y_label = document.getElementById("total_unadjusted_distances_y");
             let total_adjusted_distances_x_label = document.getElementById("total_adjusted_distances_x");
             let total_adjusted_distances_y_label = document.getElementById("total_adjusted_distances_y");
+            let plot = document.getElementById("plot");
 
             let maxes_unadjusted = [];
             let maxes_normal = [];
+            let unadjusted_x_movements = [];
+            let unadjusted_y_movements = [];
+            let adjusted_x_movements = [];
+            let adjusted_y_movements = [];
             let unadjusted_distances_x = [];
             let unadjusted_distances_y = [];
             let adjusted_distances_x = [];
             let adjusted_distances_y = [];
+            let read_numbers_unadjusted = [];
+            let read_numbers_adjusted = [];
             let distance_x = 0;
             let distance_y = 0;
             let unadjusted = false;
             let count = 0;
+            let useful_count = 0;
             let current_max_x = 0;
             let current_max_y = 0;
             let stoping_timeout = false;
@@ -68,9 +80,21 @@
                 // console.log('mouse moved', event);
                 x_label.textContent = "movementX: " + event.movementX;
                 y_label.textContent = "movementY: " + event.movementY;
+                useful_count++;
+                count++;
+                if(Math.abs(event.movementX) > 200) {
+                    if(unadjusted){
+                        unadjusted_x_movements.push(Math.abs(event.movementX));
+                        unadjusted_y_movements.push(Math.abs(event.movementY));
+                        read_numbers_unadjusted.push(useful_count);
+                    } else {
+                        adjusted_x_movements.push(Math.abs(event.movementX));
+                        adjusted_y_movements.push(Math.abs(event.movementY));
+                        read_numbers_adjusted.push(useful_count);
+                    }
+                }
                 distance_x += Math.abs(event.movementX);
                 distance_y += Math.abs(event.movementY);
-                count++;
                 if(event.movementX > current_max_x) {
                     current_max_x = event.movementX;
                 }
@@ -116,6 +140,24 @@
                 if(!stoping_timeout) {
                     setTimeout(changeLock, 200);
                 }
+
+                var unadjusted = {
+                    x: read_numbers_unadjusted,
+                    y: unadjusted_x_movements,
+                    type: 'scatter'
+                };
+
+                var adjusted = {
+                    x: read_numbers_adjusted,
+                    y: adjusted_x_movements,
+                    type: 'scatter'
+                };
+
+                var data = [unadjusted, adjusted];
+
+                Plotly.newPlot('plot', data);
+
+
                 count = 0;
             }
 
