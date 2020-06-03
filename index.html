@@ -70,7 +70,7 @@
             let distance_y = 0;
             let unadjusted = false;
             let count = 0;
-            let total_count = 0;
+            let active_switch_count = 0;
             let current_max_x = 0;
             let current_max_y = 0;
             let stoping_timeout = false;
@@ -79,8 +79,6 @@
                 // console.log('mouse moved', event);
                 x_label.textContent = "movementX: " + event.movementX;
                 y_label.textContent = "movementY: " + event.movementY;
-                total_count++;
-                read_numbers.push(total_count);
                 count++;
                 distance_x += Math.abs(event.movementX);
                 distance_y += Math.abs(event.movementY);
@@ -101,6 +99,12 @@
             }
 
             let changeLock = function() {
+                if(adjusted_distances_x + adjusted_distances_y + unadjusted_distances_x + unadjusted_distances_y == 0 && !stoping_timeout){
+                    setTimeout(changeLock, 200);
+                    return;
+                }
+                active_switch_count++;
+                read_numbers.push(active_switch_count);
                 if(unadjusted) {
                     unadjusted_distances_x.push(distance_x);
                     unadjusted_distances_y.push(distance_y);
